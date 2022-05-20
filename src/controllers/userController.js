@@ -9,6 +9,10 @@ function encodePassword(password) {
   return hash;
 }
 
+function passwordIsCorrect(password, hash) {
+  return bcrypt.compareSync(password, hash);
+}
+
 export async function create(request, response) {
   try {
     const { name, email, password } = request.body;
@@ -27,6 +31,31 @@ export async function create(request, response) {
     await connection.query(SQL, [name, email, encodedPassword]);
 
     response.status(201).json({ data: { name, email } });
+  } catch ({ message }) {
+    response.status(400).json({ error: message });
+  }
+}
+
+export async function login(request, response) {
+  try {
+    const { email, password } = request.body;
+    const paramsAreNotValid = paramsAreUndefined(email, password);
+
+    if (paramsAreNotValid) throw new Error('Missing parameters');
+
+    const errorMessage = 'Email and/or password are incorrect';
+    const connection = await connect();
+    const SQL = 'SELECT * FROM users WHERE email = ?';
+    const [users] = await connection.query(SQL, email);
+
+    if (users.length === 0) throw new Error(errorMessage);
+
+    const user = users[0];
+    const passwordIsIncorrect = !passwordIsCorrect(password, user.password);
+
+    if (passwordIsIncorrect) throw new Error(errorMessage);
+
+    response.status(200).json({ data: { name: user.name, email } });
   } catch ({ message }) {
     response.status(400).json({ error: message });
   }
