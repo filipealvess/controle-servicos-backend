@@ -1,7 +1,7 @@
 {
   "name": "controle-servicos-backend",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.2.0",
+  "description": "Backend da aplicação de Controle de Prestadores de Serviço",
   "main": "index.js",
   "type": "module",
   "scripts": {
