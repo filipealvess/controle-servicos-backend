@@ -18,3 +18,17 @@ export async function create(request, response) {
     response.status(400).json({ error: message });
   }
 }
+
+export async function list(request, response) {
+  try {
+    const { userID } = request.params;
+
+    const SQL = 'SELECT * FROM services WHERE user_id = ?';
+    const connection = await connect();
+    const [data] = await connection.query(SQL, userID);
+
+    response.status(200).json({ data });
+  } catch ({ message }) {
+    response.status(400).json({ error: message });
+  }
+}
