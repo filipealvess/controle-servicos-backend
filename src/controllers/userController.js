@@ -28,9 +28,9 @@ export async function create(request, response) {
     const SQL = 'INSERT INTO users (name, email, password) VALUE (?, ?, ?)';
     const encodedPassword = encodePassword(password);
 
-    await connection.query(SQL, [name, email, encodedPassword]);
+    const [result] = await connection.query(SQL, [name, email, encodedPassword]);
 
-    response.status(201).json({ data: { name, email } });
+    response.status(201).json({ data: { id: result.insertId, name, email } });
   } catch ({ message }) {
     response.status(400).json({ error: message });
   }
@@ -55,7 +55,7 @@ export async function login(request, response) {
 
     if (passwordIsIncorrect) throw new Error(errorMessage);
 
-    response.status(200).json({ data: { name: user.name, email } });
+    response.status(200).json({ data: { id: user.id, name: user.name, email } });
   } catch ({ message }) {
     response.status(400).json({ error: message });
   }
