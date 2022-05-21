@@ -1,11 +1,11 @@
 {
   "name": "controle-servicos-backend",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Backend da aplicação de Controle de Prestadores de Serviço",
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node index.js"
+    "start": "nodemon"
   },
   "keywords": [],
   "author": "",
