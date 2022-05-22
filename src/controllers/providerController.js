@@ -33,20 +33,21 @@ export async function create(request, response) {
 export async function list(request, response) {
   try {
     const { userID } = request.params;
-    const { page } = request.query;
+    const { page, search } = request.query;
     const connection = await connect();
     const currentPage = page ? Number(page) : 1;
+    const searchQuery = search ? `%${search}%` : '%%';
     
-    let SQL = 'SELECT COUNT(id) AS amount FROM providers WHERE user_id = ?';
-    const [rows] = await connection.query(SQL, userID);
+    let SQL = 'SELECT COUNT(id) AS amount FROM providers WHERE user_id = ? AND name LIKE ?';
+    const [rows] = await connection.query(SQL, [userID, searchQuery]);
     const providersAmount = rows[0].amount;
     const completedPages = Math.floor(providersAmount / ITEMS_PER_PAGE);
     const remainingPages = Boolean(providersAmount % ITEMS_PER_PAGE);
     const pages = completedPages + remainingPages;
-
-    SQL = 'SELECT * FROM providers WHERE user_id = ? LIMIT ? OFFSET ?';
     const offset = (currentPage - 1) * ITEMS_PER_PAGE;
-    const [data] = await connection.query(SQL, [userID, ITEMS_PER_PAGE, offset]);
+
+    SQL = 'SELECT * FROM providers WHERE user_id = ? AND name LIKE ? LIMIT ? OFFSET ?';
+    const [data] = await connection.query(SQL, [userID, searchQuery, ITEMS_PER_PAGE, offset]);
 
     response.status(200).json({ pages, currentPage, data });
   } catch ({ message }) {
