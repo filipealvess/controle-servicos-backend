@@ -37,7 +37,7 @@ export async function list(request, response) {
     const connection = await connect();
     const currentPage = page ? Number(page) : 1;
     const searchQuery = search ? `%${search}%` : '%%';
-    
+
     let SQL = 'SELECT COUNT(id) AS amount FROM providers WHERE user_id = ? AND name LIKE ?';
     const [rows] = await connection.query(SQL, [userID, searchQuery]);
     const providersAmount = rows[0].amount;
@@ -46,7 +46,7 @@ export async function list(request, response) {
     const pages = completedPages + remainingPages;
     const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
-    SQL = 'SELECT * FROM providers WHERE user_id = ? AND name LIKE ? LIMIT ? OFFSET ?';
+    SQL = 'SELECT * FROM providers WHERE user_id = ? AND name LIKE ? ORDER BY name ASC LIMIT ? OFFSET ?';
     const [data] = await connection.query(SQL, [userID, searchQuery, ITEMS_PER_PAGE, offset]);
 
     response.status(200).json({ pages, currentPage, data });

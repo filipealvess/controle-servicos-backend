@@ -23,7 +23,7 @@ export async function list(request, response) {
   try {
     const { userID } = request.params;
 
-    const SQL = 'SELECT * FROM services WHERE user_id = ?';
+    const SQL = 'SELECT * FROM services WHERE user_id = ? ORDER BY name ASC';
     const connection = await connect();
     const [data] = await connection.query(SQL, userID);
 
