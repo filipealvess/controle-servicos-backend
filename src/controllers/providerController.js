@@ -56,8 +56,17 @@ export async function list(request, response) {
 
     SQL = 'SELECT * FROM providers WHERE user_id = ? AND name LIKE ? ORDER BY name ASC LIMIT ? OFFSET ?';
     const [data] = await connection.query(SQL, [userID, searchQuery, ITEMS_PER_PAGE, offset]);
+    
+    SQL = 'SELECT services.name, providers.id AS provider_id FROM services INNER JOIN prices ON prices.service_id = services.id INNER JOIN providers ON providers.id = prices.provider_id';
+    const [servicesData] = await connection.query(SQL);
+    const providers = data.map(({ id, image_path, name, phone, email }) => {
+      const services = servicesData.filter(({ provider_id }) => provider_id === id)
+        .map(({ name }) => name);
 
-    response.status(200).json({ pages, currentPage, data });
+      return { id, avatar: image_path, name, phone, email, services };
+    });
+
+    response.status(200).json({ pages, currentPage, data: providers });
   } catch ({ message }) {
     response.status(500).json({ error: message });
   }
