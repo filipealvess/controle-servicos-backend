@@ -18,12 +18,16 @@ export async function create(request, response) {
     const { name, email, password } = request.body;
     const paramsAreNotValid = paramsAreUndefined(name, email, password);
 
-    if (paramsAreNotValid) throw new Error('Missing parameters');
+    if (paramsAreNotValid) {
+      return response.status(400).json({ error: 'Missing parameters' });
+    };
 
     const connection = await connect();
     const [users] = await connection.query('SELECT * FROM users WHERE email = ?', email);
 
-    if (users.length > 0) throw new Error('Already exists an user with this email address');
+    if (users.length > 0) {
+      return response.status(400).json({ error: 'Already exists an user with this email address' });
+    };
 
     const SQL = 'INSERT INTO users (name, email, password) VALUE (?, ?, ?)';
     const encodedPassword = encodePassword(password);
@@ -32,7 +36,7 @@ export async function create(request, response) {
 
     response.status(201).json({ data: { id: result.insertId, name, email } });
   } catch ({ message }) {
-    response.status(400).json({ error: message });
+    response.status(500).json({ error: message });
   }
 }
 
@@ -41,22 +45,28 @@ export async function login(request, response) {
     const { email, password } = request.body;
     const paramsAreNotValid = paramsAreUndefined(email, password);
 
-    if (paramsAreNotValid) throw new Error('Missing parameters');
+    if (paramsAreNotValid) {
+      return response.status(400).json({ error: 'Missing parameters' });
+    };
 
     const errorMessage = 'Email and/or password are incorrect';
     const connection = await connect();
     const SQL = 'SELECT * FROM users WHERE email = ?';
     const [users] = await connection.query(SQL, email);
 
-    if (users.length === 0) throw new Error(errorMessage);
+    if (users.length === 0) {
+      return response.status(400).json({ error: errorMessage });
+    };
 
     const user = users[0];
     const passwordIsIncorrect = !passwordIsCorrect(password, user.password);
 
-    if (passwordIsIncorrect) throw new Error(errorMessage);
+    if (passwordIsIncorrect) {
+      return response.status(400).json({ error: errorMessage });
+    };
 
     response.status(200).json({ data: { id: user.id, name: user.name, email } });
   } catch ({ message }) {
-    response.status(400).json({ error: message });
+    response.status(500).json({ error: message });
   }
 }
