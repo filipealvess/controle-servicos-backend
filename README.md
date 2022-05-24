@@ -21,12 +21,20 @@ cd controle-servicos-backend
 ```
 
 3. Crie um arquivo `.env` com os seguintes dados
-```env
-# porta onde o servidor executará
-SERVER_PORT = 
+> Para facilitar a criação das tabelas do banco de dados, você pode importar o arquivo [`database.sql`](.github/database.sql) no seu provedor de banco de dados
 
-# link do banco de dados MySQL
-DATABASE_URL = 
+```env
+# endereço do provedor do banco de dados
+DB_HOST = 
+
+# nome do banco de dados
+DB_NAME = 
+
+# usuário do banco de dados
+DB_USER = 
+
+# senha do banco de dados
+DB_PASS = 
 ```
 
 4. Instale as dependências
@@ -38,3 +46,6 @@ npm install
 ```
 npm start
 ```
+
+## Importação
+Para testar a importação de dados, você pode utilizar o arquivo [`spreadsheet.csv`](.github/spreadsheet.csv).
